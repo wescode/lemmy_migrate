@@ -45,7 +45,6 @@ class Lemmy:
             # iterate over each page if needed
             fetched = 50 #max limit
             while fetched == 50:
-                # rate limit: 60 messages in 6s
                 self._requests_total += 1
                 resp = requests.get(f"{self._site_url}/{self._api_base_url}/community/list",
                                     params=payload)
@@ -86,7 +85,6 @@ class Lemmy:
                     print(f"   Subscribing to {url['name']} ({comm_id})")
                     self._requests_total += 1
                     print(f"   Total request: {self._requests_total}")
-                    # rate limit: 60 messages in 6s
                     self.rate_limit()
                     resp = requests.post(f"{self._site_url}/{self._api_base_url}/community/follow",
                                         json=payload)
@@ -105,8 +103,8 @@ class Lemmy:
 
         community_id = None
         try:
-            # rate limit: 60 messages in 6s
             self._requests_total += 1
+            self.rate_limit()
             resp = requests.get(f"{self._site_url}/{self._api_base_url}/resolve_object",
                                 params=payload)
             resp.raise_for_status()
@@ -119,10 +117,9 @@ class Lemmy:
         return community_id
     
     def rate_limit(self):
-        return
-        if self._requests_total >= 20:
-            print("   Rate limited, sleep for 6s...")
-            sleep(6)
-            self._requests_total = 1
+        #if self._requests_total >= 15:
+        #    print("   Rate limited, sleep for 10s...")
+        sleep(1)
+        #    self._requests_total = 1
         
         return
