@@ -22,42 +22,37 @@ class Lemmy:
         }
         
         try:
-            resp = requests.post(f"{self._site_url}/{self._api_base_url}/user/login",
-                             json=payload)
-            resp.raise_for_status()
+            resp = self._request_it(f"{self._site_url}/{self._api_base_url}/user/login",
+                                method='POST', json=payload)
             self._auth_token = resp.json()['jwt']
-        except requests.exceptions.HTTPError as ex:
-            print(f"   HTTP error: {ex.response}, while authenticating")
-            raise Exception(f"HTTP error: {ex.response} while authenticating")
-        except requests.exceptions.RequestException as ex:
-            raise Exception(f"Error: {ex} while authenticating")
-
+        except Exception as e:
+            raise Exception(f"Failed to authenticate: {e}")
+            
     def get_communities(self):
         '''Get list of currently subscribed communites'''
-        try:
-            payload = { 
-                    'type_': 'Subscribed',
-                    'auth': self._auth_token,
-                    'limit': 50,
-                    'page': 1
-            }
+        payload = { 
+                'type_': 'Subscribed',
+                'auth': self._auth_token,
+                'limit': 50,
+                'page': 1
+        }
             
-            # iterate over each page if needed
-            fetched = 50 #max limit
-            while fetched == 50:
-                self._requests_total += 1
-                resp = requests.get(f"{self._site_url}/{self._api_base_url}/community/list",
+        # iterate over each page if needed
+        fetched = 50 #max limit
+        while fetched == 50:
+            self._requests_total += 1
+            try:
+                resp = self._request_it(f"{self._site_url}/{self._api_base_url}/community/list",
                                     params=payload)
                 fetched = len(resp.json()['communities'])
-                #print(f"length: {fetched}")
                 payload['page'] += 1
 
                 for comm in resp.json()['communities']:
                     id = comm['community']['id']
                     url = comm['community']['actor_id']
                     self._user_communities[id]['name'] = url
-        except Exception as err:
-            print(f"error: {err}")
+            except Exception as err:
+                print(f"error: {err}")
         
         return self._user_communities
 
@@ -84,15 +79,15 @@ class Lemmy:
                     payload['community_id'] = comm_id
                     print(f"   Subscribing to {url['name']} ({comm_id})")
                     self._requests_total += 1
-                    print(f"   Total request: {self._requests_total}")
-                    self.rate_limit()
-                    resp = requests.post(f"{self._site_url}/{self._api_base_url}/community/follow",
-                                        json=payload)
-                    resp.raise_for_status()
-            except requests.exceptions.HTTPError as ex:
-                print(f"   HTTP error: {ex.response}, while adding {cid}")
-            except requests.exceptions.RequestException as ex:
-                print(f"   Error: {ex}")
+                    #print(f"   Total request: {self._requests_total}")
+                    self._rate_limit()
+                    resp = self._request_it(f"{self._site_url}/{self._api_base_url}/community/follow",
+                                        json=payload, method='POST')
+                    
+                    if resp.status_code == 200:
+                        print(f"   Succesfully subscribed to {url['name']} ({comm_id})")
+            except Exception as e:
+                print(f"   API error: {e}")
 
     def fetch_community(self, community):
         '''Fetch a communityt'''
@@ -104,22 +99,32 @@ class Lemmy:
         community_id = None
         try:
             self._requests_total += 1
-            self.rate_limit()
-            resp = requests.get(f"{self._site_url}/{self._api_base_url}/resolve_object",
+            self._rate_limit()
+            resp = self._request_it(f"{self._site_url}/{self._api_base_url}/resolve_object",
                                 params=payload)
-            resp.raise_for_status()
             community_id = resp.json()['community']['community']['id']
-        except requests.exceptions.HTTPError as ex:
-            print(f"   HTTP error: {ex.response}, while fetching {community}")
-        except requests.exceptions.RequestException as ex:
-            print(f"   Error: {ex}")
+        except Exception as e:
+            print(f"   Failed to fetch community {e}")
 
         return community_id
     
-    def rate_limit(self):
+    def _rate_limit(self):
         #if self._requests_total >= 15:
         #    print("   Rate limited, sleep for 10s...")
         sleep(1)
         #    self._requests_total = 1
         
+        return
+    
+    def _request_it(self, endpoint, method='GET', params=None, json=None):
+        try:
+            r = requests.request(method, url=endpoint, params=params, json=json)
+            r.raise_for_status()
+            return r
+        except requests.exceptions.HTTPError as e:
+            #raise Exception(f"Error at endpoint {endpoint}: {ex}")
+            raise Exception(e)
+        except requests.exceptions.RequestException as e:
+            raise Exception(e)
+            #raise Exception(f"Error at endpoint {endpoint}: {ex}")
         return
