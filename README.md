@@ -1,4 +1,4 @@
-# Migrate your communities from one account to another
+# Migrate your subscribed Lemmy communities from one account to another
 
 ## Usage
 ```
