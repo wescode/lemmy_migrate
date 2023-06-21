@@ -25,4 +25,4 @@ Site = https://lemmy.ml
 User = cooluser
 Password = badpassword
 ```
-[Main Account] is required for your primary account, and you can have as many sub accounts as you wish, labeled anything.
+[Main Account] is required for your primary account, and you can have as many secondarys accounts as you wish, labeled anything.
