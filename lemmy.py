@@ -108,6 +108,25 @@ class Lemmy:
 
         return community_id
     
+    def get_comments(
+            self, post_id: str, max_depth: int = 1,
+            limit: int = 1000) -> dict:
+
+        payload = {
+            'post_id': post_id,
+            'max_depth': max_depth,
+            'limit': limit,
+        }
+
+        try:
+            r = self._request_it(
+                f"{self._site_url}/{self._api_base_url}/comment/list",
+                params=payload)
+        except Exception as e:
+            self._println(2, f"> Failed to get comment list")
+
+        return r.json()['comments']
+
     def _rate_limit(self):
         sleep(1)
     
