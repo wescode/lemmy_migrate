@@ -45,8 +45,9 @@ def main():
         print(f" {len(comms)} subscribed communities found")
         new_communities = {c: communties[c] for c in communties if c not in comms}
         
-        print(f" Subscribing to {len(new_communities)} new communities")
-        new_lemming.subscribe(new_communities)
+        if new_communities:
+            print(f" Subscribing to {len(new_communities)} new communities")
+            new_lemming.subscribe(new_communities)
 
 if __name__ == "__main__":
     main()
