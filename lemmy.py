@@ -11,9 +11,11 @@ class Lemmy:
     _api_base_url = f"api/{_api_version}"
     
     def __init__(self, url) -> None:
-        __parsed_url = urlparse(url)
-        __url_path = __parsed_url.netloc if __parsed_url.netloc else __parsed_url.path
-        self._site_url = urlparse(__url_path)._replace(scheme='https', netloc=__url_path, path='').geturl()
+        parsed_url = urlparse(url)
+        url_path = parsed_url.netloc if parsed_url.netloc else parsed_url.path
+        self._site_url = urlparse(url_path)._replace(scheme='https',
+                                                     netloc=url_path,
+                                                     path='').geturl()
         self._auth_token = None
         self._user_communities = defaultdict(dict)
     
