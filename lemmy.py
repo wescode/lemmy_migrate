@@ -32,10 +32,10 @@ class Lemmy:
                 method='POST', json=payload)
             self._auth_token = resp.json()['jwt']
         except Exception as e:
-          #raise Exception(f"Failed to authenticate: {e}")
-          self._println(1, f"[ERROR]: login() failed for {user} on {self._site_url}")
-          self._println(2, f"-Details: {e}")
-          sys.exit(1)
+            self._println(1, f"[ERROR]: login() failed for {user}"
+                          f" on {self._site_url}")
+            self._println(2, f"-Details: {e}")
+            sys.exit(1)
             
     def get_communities(self, type: str = "Subscribed") -> dict:
         """Get list of currently subscribed communites"""
@@ -47,7 +47,7 @@ class Lemmy:
         }
             
         # iterate over each page if needed
-        fetched = 50 #max limit
+        fetched = 50  # max limit
         while fetched == 50:
             try:
                 resp = self._request_it(
@@ -66,7 +66,9 @@ class Lemmy:
         return self._user_communities
 
     def subscribe(self, communities: dict = None) -> None:
-        """Subscribe to a community. It will first attempt to resolve community."""
+        """Subscribe to a community. It will first attempt to
+        resolve community.
+        """
         if communities:
             self._user_communities = communities
         else:
@@ -78,7 +80,7 @@ class Lemmy:
             'auth': self._auth_token
         }
 
-        for url,cid in self._user_communities.items():
+        for url, cid in self._user_communities.items():
             try: 
                 # resolve community first
                 comm_id = self.resolve_community(url)
@@ -87,11 +89,13 @@ class Lemmy:
                     payload['community_id'] = comm_id
                     self._println(2, f"> Subscribing to {url} ({comm_id})")
                     resp = self._request_it(
-                        f"{self._site_url}/{self._api_base_url}/community/follow",
+                        f"{self._site_url}/"
+                        f"{self._api_base_url}/community/follow",
                         json=payload, method='POST')
                     
                     if resp.status_code == 200:
-                        self._println(3, f"> Succesfully subscribed to {url} ({comm_id})")
+                        self._println(3, f"> Succesfully subscribed"
+                                      f" to {url} ({comm_id})")
             except Exception as e:
                 print(f"   API error: {e}")
 
@@ -142,7 +146,8 @@ class Lemmy:
             
         self._rate_limit()
         try:
-            r = requests.request(method, url=endpoint, params=params, json=json)
+            r = requests.request(method, url=endpoint,
+                                 params=params, json=json)
             r.raise_for_status()
             return r
         except requests.exceptions.HTTPError as e:

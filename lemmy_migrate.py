@@ -3,6 +3,7 @@ import argparse
 import configparser
 from lemmy import Lemmy
 
+
 def get_config(cfile):
     config = configparser.ConfigParser()
     read = config.read(cfile)
