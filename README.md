@@ -9,6 +9,7 @@ Migrate subscribed communities from one account to another
 options:
   -h, --help      show this help message and exit
   -c config_file  Path to config file
+  -u, --update-main  use to update main account subscriptions
 ```
 
 ## Configuration
