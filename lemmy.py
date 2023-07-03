@@ -65,7 +65,7 @@ class Lemmy:
         
         return self._user_communities
 
-    def subscribe(self, communities: dict = None) -> None:
+    def subscribe(self, communities: dict) -> None:
         """Subscribe to a community. It will first attempt to
         resolve community.
         """
