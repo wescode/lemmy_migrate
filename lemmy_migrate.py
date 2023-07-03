@@ -5,7 +5,7 @@ from lemmy import Lemmy
 
 
 def get_config(cfile):
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(interpolation=None)
     read = config.read(cfile)
     if not read:
         print(f"Could not read config {cfile}!")
