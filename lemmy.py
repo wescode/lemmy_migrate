@@ -69,19 +69,14 @@ class Lemmy:
         """Subscribe to a community. It will first attempt to
         resolve community.
         """
-        if communities:
-            self._user_communities = communities
-        else:
-            self.get_communities()
-
         payload = {
             'community_id': None,
             'follow': True,
             'auth': self._auth_token
         }
 
-        for url, cid in self._user_communities.items():
-            try: 
+        for url, cid in communities.items():
+            try:
                 # resolve community first
                 comm_id = self.resolve_community(url)
                 
@@ -94,6 +89,7 @@ class Lemmy:
                         json=payload, method='POST')
                     
                     if resp.status_code == 200:
+                        self._user_communities[url]['id'] = comm_id
                         self._println(3, f"> Succesfully subscribed"
                                       f" to {url} ({comm_id})")
             except Exception as e:
