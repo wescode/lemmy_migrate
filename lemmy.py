@@ -13,7 +13,7 @@ class Lemmy:
     def __init__(self, url) -> None:
         parsed_url = urlparse(url)
         url_path = parsed_url.netloc if parsed_url.netloc else parsed_url.path
-        self._site_url = urlparse(url_path)._replace(scheme='https',
+        self.site_url = urlparse(url_path)._replace(scheme='https',
                                                      netloc=url_path,
                                                      path='').geturl()
         self._auth_token = None
@@ -28,12 +28,12 @@ class Lemmy:
         
         try:
             resp = self._request_it(
-                f"{self._site_url}/{self._api_base_url}/user/login",
+                f"{self.site_url}/{self._api_base_url}/user/login",
                 method='POST', json=payload)
             self._auth_token = resp.json()['jwt']
         except Exception as e:
             self._println(1, f"[ERROR]: login() failed for {user}"
-                          f" on {self._site_url}")
+                          f" on {self.site_url}")
             self._println(2, f"-Details: {e}")
             sys.exit(1)
             
@@ -51,7 +51,7 @@ class Lemmy:
         while fetched == 50:
             try:
                 resp = self._request_it(
-                    f"{self._site_url}/{self._api_base_url}/community/list",
+                    f"{self.site_url}/{self._api_base_url}/community/list",
                     params=payload)
                 fetched = len(resp.json()['communities'])
                 payload['page'] += 1
@@ -84,7 +84,7 @@ class Lemmy:
                     payload['community_id'] = comm_id
                     self._println(2, f"> Subscribing to {url} ({comm_id})")
                     resp = self._request_it(
-                        f"{self._site_url}/"
+                        f"{self.site_url}/"
                         f"{self._api_base_url}/community/follow",
                         json=payload, method='POST')
                     
@@ -106,7 +106,7 @@ class Lemmy:
         self._println(1, f"> Resolving {community}")
         try:
             resp = self._request_it(
-                f"{self._site_url}/{self._api_base_url}/resolve_object",
+                f"{self.site_url}/{self._api_base_url}/resolve_object",
                 params=payload)
             community_id = resp.json()['community']['community']['id']
         except Exception as e:
@@ -126,7 +126,7 @@ class Lemmy:
 
         try:
             r = self._request_it(
-                f"{self._site_url}/{self._api_base_url}/comment/list",
+                f"{self.site_url}/{self._api_base_url}/comment/list",
                 params=payload)
         except Exception as e:
             self._println(2, f"> Failed to get comment list")
