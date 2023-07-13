@@ -30,13 +30,16 @@ def get_args():
     return args
 
 
-def sync_subscriptions(src_acct, dest_acct):
-    print(f"\n[ Subscribing {dest_acct._site_url} to new communities from {src_acct._site_url} ]")
-    print('getting list of subscribed communities from the two communities')
+def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy):
+    print(f"\n[ Subscribing {dest_acct.site_url} to new communities from "
+          f"{src_acct.site_url} ]")
+    print(' Getting list of subscribed communities from the two communities')
     src_comms = src_acct.get_communities()
-    print(f" {len(src_comms)} subscribed communities found in the source")
+    print(f" {len(src_comms)} subscribed communities found in the source"
+          f" {src_acct.site_url}")
     dest_comms = dest_acct.get_communities()
-    print(f" {len(dest_comms)} subscribed communities found in the target")
+    print(f" {len(dest_comms)} subscribed communities found in the target"
+          f" {dest_acct.site_url}")
 
     new_communities = {c: src_comms[c] for c in src_comms if c not in dest_comms}
 
@@ -63,7 +66,7 @@ def main():
         new_lemming.login(accounts[acc]['user'], accounts[acc]['password'])
 
         if update_main:
-            print('update_main flag set. updating main account subscriptions')
+            print(' Update main flag set. Updating main account subscriptions')
             src = new_lemming
             dest = main_lemming
         else:
