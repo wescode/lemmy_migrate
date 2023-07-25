@@ -1,6 +1,5 @@
 import sys
 import requests
-from collections import defaultdict
 from time import sleep
 from urllib.parse import urlparse
 
@@ -14,10 +13,10 @@ class Lemmy:
         parsed_url = urlparse(url)
         url_path = parsed_url.netloc if parsed_url.netloc else parsed_url.path
         self.site_url = urlparse(url_path)._replace(scheme='https',
-                                                     netloc=url_path,
-                                                     path='').geturl()
+                                                    netloc=url_path,
+                                                    path='').geturl()
         self._auth_token = None
-        self._user_communities = defaultdict(dict)
+        self._user_communities = []
     
     def login(self, user: str, password: str) -> None:
         """authenticate to instance"""
@@ -37,7 +36,7 @@ class Lemmy:
             self._println(2, f"-Details: {e}")
             sys.exit(1)
             
-    def get_communities(self, type: str = "Subscribed") -> dict:
+    def get_communities(self, type: str = "Subscribed") -> list:
         """Get list of currently subscribed communites"""
         payload = { 
             'type_': type,
@@ -57,15 +56,14 @@ class Lemmy:
                 payload['page'] += 1
 
                 for comm in resp.json()['communities']:
-                    id = comm['community']['id']
                     url = comm['community']['actor_id']
-                    self._user_communities[url]['id'] = id
+                    self._user_communities.append(url)
             except Exception as err:
                 print(f"error: {err}")
         
         return self._user_communities
 
-    def subscribe(self, communities: dict) -> None:
+    def subscribe(self, communities: list) -> None:
         """Subscribe to a community. It will first attempt to
         resolve community.
         """
@@ -75,7 +73,7 @@ class Lemmy:
             'auth': self._auth_token
         }
 
-        for url, cid in communities.items():
+        for url in communities:
             try:
                 # resolve community first
                 comm_id = self.resolve_community(url)
@@ -89,7 +87,7 @@ class Lemmy:
                         json=payload, method='POST')
                     
                     if resp.status_code == 200:
-                        self._user_communities[url]['id'] = comm_id
+                        self._user_communities.append(comm_id)
                         self._println(3, f"> Succesfully subscribed"
                                       f" to {url} ({comm_id})")
             except Exception as e:
@@ -99,7 +97,7 @@ class Lemmy:
         """resolve a community"""
         payload = {
             'q': community,
-            'auth':self._auth_token
+            'auth': self._auth_token
         }
 
         community_id = None
