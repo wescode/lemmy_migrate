@@ -31,3 +31,7 @@ Password = badpassword
 ```
 [Main Account] is required for your primary account, and you can have as many secondary accounts as you wish. Label for
 secondary accounts can be anything.
+
+
+## Requirements
+Python >= 3.10
