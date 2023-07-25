@@ -39,14 +39,14 @@ def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy, fimport):
     print(f"\n[ Subscribing {dest_acct.site_url} to new communities from "
           f"{src_acct.site_url} ]")
     print(' Getting list of subscribed communities from the two communities')
-    src_comms = src_acct.get_communities()
+    if fimport:
+        src_comms = fimport
+    else:
+        src_comms = src_acct.get_communities()
     print(f" {len(src_comms)} subscribed communities found in the source"
           f" {src_acct.site_url}")
-    if fimport:
-        dest_comms = fimport
-    else:
-        dest_comms = dest_acct.get_communities()
-
+    
+    dest_comms = dest_acct.get_communities()
     print(f" {len(dest_comms)} subscribed communities found in the target"
           f" {dest_acct.site_url}")
 
