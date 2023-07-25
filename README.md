@@ -2,14 +2,17 @@
 
 ## Usage
 ```
-usage: lemmy_migrate [-h] -c config_file
+usage: lemmy_migrate [-h] -c <config file> [-u] [-e <export file>] [-i <import file>]
 
 Migrate subscribed communities from one account to another
 
 options:
-  -h, --help      show this help message and exit
-  -c config_file  Path to config file
-  -u, --update-main  use to update main account subscriptions
+  -h, --help        show this help message and exit
+  -c <config file>  Path to config file
+  -u                use to update main account subscriptions
+  -e <export file>  Export main account subscriptions to json
+  -i <import file>  Import subscriptions from json file
+
 ```
 
 ## Configuration

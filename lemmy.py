@@ -16,7 +16,7 @@ class Lemmy:
                                                     netloc=url_path,
                                                     path='').geturl()
         self._auth_token = None
-        self._user_communities = []
+        self._user_communities = set()
     
     def login(self, user: str, password: str) -> None:
         """authenticate to instance"""
@@ -57,7 +57,7 @@ class Lemmy:
 
                 for comm in resp.json()['communities']:
                     url = comm['community']['actor_id']
-                    self._user_communities.append(url)
+                    self._user_communities.add(url)
             except Exception as err:
                 print(f"error: {err}")
         
@@ -87,7 +87,7 @@ class Lemmy:
                         json=payload, method='POST')
                     
                     if resp.status_code == 200:
-                        self._user_communities.append(comm_id)
+                        self._user_communities.add(comm_id)
                         self._println(3, f"> Succesfully subscribed"
                                       f" to {url} ({comm_id})")
             except Exception as e:
