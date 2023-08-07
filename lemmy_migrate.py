@@ -18,39 +18,51 @@ def get_config(cfile):
 
 def get_args():
     parser = argparse.ArgumentParser(
-        prog='lemmy_migrate',
-        description='Migrate subscribed communities from one account to another')
+        prog="lemmy_migrate",
+        description=f"Migrate subscribed "
+        f"communities from one account "
+        f"to another",
+    )
 
-    parser.add_argument('-c', required=True, help="Path to config file",
-                        metavar="<config file>")
-    parser.add_argument('-u',
-                        help="use to update main account subscriptions",
-                        action='store_true',
-                        default=False)
-    parser.add_argument('-e',
-                        help="Export main account subscriptions to json",
-                        metavar='<export file>')
-    parser.add_argument('-i',
-                        help="Import subscriptions from json file",
-                        metavar='<import file>')
+    parser.add_argument(
+        "-c", required=True, help="Path to config file", metavar="<config file>"
+    )
+    parser.add_argument(
+        "-u",
+        help="use to update main account subscriptions",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "-e", help="Export main account subscriptions to json", metavar="<export file>"
+    )
+    parser.add_argument(
+        "-i", help="Import subscriptions from json file", metavar="<import file>"
+    )
     args = parser.parse_args()
     return args
 
 
 def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy, from_backup):
-    print(f"\n[ Subscribing {dest_acct.site_url} to new communities from "
-          f"{src_acct.site_url} ]")
-    print(' Getting list of subscribed communities from the two communities')
+    print(
+        f"\n[ Subscribing {dest_acct.site_url} to new communities from "
+        f"{src_acct.site_url} ]"
+    )
+    print(" Getting list of subscribed communities from the two communities")
     if from_backup:
         src_comms = from_backup
     else:
         src_comms = src_acct.get_communities()
-    print(f" {len(src_comms)} subscribed communities found in the source"
-          f" {src_acct.site_url}")
-    
+    print(
+        f" {len(src_comms)} subscribed communities found in the source"
+        f" {src_acct.site_url}"
+    )
+
     dest_comms = dest_acct.get_communities()
-    print(f" {len(dest_comms)} subscribed communities found in the target"
-          f" {dest_acct.site_url}")
+    print(
+        f" {len(dest_comms)} subscribed communities found in the target"
+        f" {dest_acct.site_url}"
+    )
 
     new_communities = [c for c in src_comms if c not in dest_comms]
 
@@ -87,12 +99,12 @@ def main():
     accounts = get_config(cfg.c)
 
     # source site
-    print(f"\n[ Getting Main Account info -"
-          f" {accounts['Main Account']['site']} ]")
-    main_lemming = Lemmy(accounts['Main Account']['site'])
-    main_lemming.login(accounts['Main Account']['user'],
-                       accounts['Main Account']['password'])
-    accounts.pop('Main Account', None)
+    print(f"\n[ Getting Main Account info -" f" {accounts['Main Account']['site']} ]")
+    main_lemming = Lemmy(accounts["Main Account"]["site"])
+    main_lemming.login(
+        accounts["Main Account"]["user"], accounts["Main Account"]["password"]
+    )
+    accounts.pop("Main Account", None)
 
     # export subscriptions
     if cfg.e:
@@ -103,15 +115,15 @@ def main():
     comms_backup = None
     if cfg.i and not cfg.u:
         comms_backup = read_backup(cfg.i)
-    
+
     # sync main account communities to each account
     for acc in accounts:
         print(f"\n[ Getting {acc} - {accounts[acc]['site']} ]")
-        new_lemming = Lemmy(accounts[acc]['site'])
-        new_lemming.login(accounts[acc]['user'], accounts[acc]['password'])
+        new_lemming = Lemmy(accounts[acc]["site"])
+        new_lemming.login(accounts[acc]["user"], accounts[acc]["password"])
 
         if cfg.u:
-            print(' Update main flag set. Updating main account subscriptions')
+            print(" Update main flag set. Updating main account subscriptions")
             src = new_lemming
             dest = main_lemming
         else:
