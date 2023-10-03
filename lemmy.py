@@ -1,6 +1,7 @@
 import sys
 import requests
 from time import sleep
+from typing import Optional
 from urllib.parse import urlparse
 
 
@@ -37,7 +38,7 @@ class Lemmy:
             self._println(2, f"-Details: {e}")
             sys.exit(1)
 
-    def get_communities(self, type: str = "Subscribed") -> list:
+    def get_communities(self, type: str = "Subscribed") -> set:
         """Get list of currently subscribed communites"""
         payload = {"type_": type, "auth": self._auth_token, "limit": 50, "page": 1}
 
@@ -107,7 +108,7 @@ class Lemmy:
 
         return community_id
 
-    def get_comments(self, post_id: str, max_depth: int = 1, limit: int = 1000) -> dict:
+    def get_comments(self, post_id: str, max_depth: int = 1, limit: int = 1000) -> Optional[dict]:
         """Get all comments for a post"""
         payload = {
             "post_id": post_id,
@@ -121,14 +122,18 @@ class Lemmy:
             )
         except Exception as e:
             self._println(2, f"> Failed to get comment list")
-
-        return r.json()["comments"]
+        else:
+            return r.json()["comments"]
 
     def _rate_limit(self):
         sleep(1)
 
     def _request_it(
-        self, endpoint: str, method: str = "GET", params: str = None, json: dict = None
+        self,
+        endpoint: str,
+        method: str = "GET",
+        params: Optional[str | dict] = None,
+        json: Optional[dict] = None,
     ) -> requests.Response:
         self._rate_limit()
         try:
