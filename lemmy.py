@@ -32,6 +32,11 @@ class Lemmy:
 
     def get_communities(self, type: str = "Subscribed") -> list:
         """Get list of currently subscribed communites"""
+        
+        # Return cached communities if already fetched
+        if self._user_communities:
+            return self._user_communities
+        
         payload = {"type_": type, "auth": self._auth_token, "limit": 50, "page": 1}
 
         # iterate over each page if needed
