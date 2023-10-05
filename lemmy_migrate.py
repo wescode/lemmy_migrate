@@ -1,7 +1,8 @@
-import sys
 import argparse
 import configparser
 import json
+import sys
+
 from lemmy import Lemmy
 
 
@@ -19,9 +20,7 @@ def get_config(cfile):
 def get_args():
     parser = argparse.ArgumentParser(
         prog="lemmy_migrate",
-        description=f"Migrate subscribed "
-        f"communities from one account "
-        f"to another",
+        description="Migrate subscribed communities from one account to another",
     )
 
     parser.add_argument(
@@ -102,9 +101,13 @@ def main():
     print(f"\n[ Getting Main Account info -" f" {accounts['Main Account']['site']} ]")
     main_lemming = Lemmy(accounts["Main Account"]["site"])
     try:
-        main_lemming.login(accounts["Main Account"]["user"], accounts["Main Account"]["password"])
+        main_lemming.login(
+            accounts["Main Account"]["user"], accounts["Main Account"]["password"]
+        )
     except Exception as e:
-        print(f"Unable to login to {accounts['Main Account']['site']}. Check your credentials and try again.")
+        print(
+            f"Unable to login to {accounts['Main Account']['site']}. Check your credentials and try again."
+        )
         print(f"{e}")
         sys.exit(1)
     else:
@@ -127,7 +130,7 @@ def main():
         print(f"\n[ Getting {acc} - {accounts[acc]['site']} ]")
         new_lemming = Lemmy(accounts[acc]["site"])
         try:
-           new_lemming.login(accounts[acc]["user"], accounts[acc]["password"])
+            new_lemming.login(accounts[acc]["user"], accounts[acc]["password"])
         except Exception as e:
             print(f"Unable to login to {acc}: {e}")
             print("Continuing to next account...")

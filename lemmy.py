@@ -1,4 +1,3 @@
-import sys
 import requests
 from time import sleep
 from typing import Optional
@@ -33,11 +32,11 @@ class Lemmy:
 
     def get_communities(self, type: str = "Subscribed") -> set:
         """Get list of currently subscribed communites"""
-        
+
         # Return cached communities if already fetched
         if self._user_communities:
             return self._user_communities
-        
+
         payload = {"type_": type, "auth": self._auth_token, "limit": 50, "page": 1}
 
         # iterate over each page if needed
@@ -106,7 +105,9 @@ class Lemmy:
 
         return community_id
 
-    def get_comments(self, post_id: str, max_depth: int = 1, limit: int = 1000) -> Optional[dict]:
+    def get_comments(
+        self, post_id: str, max_depth: int = 1, limit: int = 1000
+    ) -> Optional[dict]:
         """Get all comments for a post"""
         payload = {
             "post_id": post_id,
@@ -119,7 +120,7 @@ class Lemmy:
                 f"{self.site_url}/{self._api_base_url}/" f"comment/list", params=payload
             )
         except Exception as e:
-            self._println(2, f"> Failed to get comment list")
+            self._println(2, "> Failed to get comment list")
         else:
             return r.json()["comments"]
 
