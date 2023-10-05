@@ -23,19 +23,12 @@ class Lemmy:
         """authenticate to instance"""
         payload = {"username_or_email": user, "password": password}
 
-        try:
-            resp = self._request_it(
-                f"{self.site_url}/" f"{self._api_base_url}/user/login",
-                method="POST",
-                json=payload,
-            )
-            self._auth_token = resp.json()["jwt"]
-        except Exception as e:
-            self._println(
-                1, f"[ERROR]: login() failed for {user}" f" on {self.site_url}"
-            )
-            self._println(2, f"-Details: {e}")
-            sys.exit(1)
+        resp = self._request_it(
+            f"{self.site_url}/" f"{self._api_base_url}/user/login",
+            method="POST",
+            json=payload,
+        )
+        self._auth_token = resp.json()["jwt"]
 
     def get_communities(self, type: str = "Subscribed") -> list:
         """Get list of currently subscribed communites"""

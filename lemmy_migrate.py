@@ -101,9 +101,15 @@ def main():
     # source site
     print(f"\n[ Getting Main Account info -" f" {accounts['Main Account']['site']} ]")
     main_lemming = Lemmy(accounts["Main Account"]["site"])
-    main_lemming.login(
-        accounts["Main Account"]["user"], accounts["Main Account"]["password"]
-    )
+    try:
+        main_lemming.login(accounts["Main Account"]["user"], accounts["Main Account"]["password"])
+    except Exception as e:
+        print(f"Unable to login to {accounts['Main Account']['site']}. Check your credentials and try again.")
+        print(f"{e}")
+        sys.exit(1)
+    else:
+        print(f"Logged into {accounts['Main Account']['site']}.")
+
     accounts.pop("Main Account", None)
 
     # export subscriptions
@@ -120,7 +126,12 @@ def main():
     for acc in accounts:
         print(f"\n[ Getting {acc} - {accounts[acc]['site']} ]")
         new_lemming = Lemmy(accounts[acc]["site"])
-        new_lemming.login(accounts[acc]["user"], accounts[acc]["password"])
+        try:
+           new_lemming.login(accounts[acc]["user"], accounts[acc]["password"])
+        except Exception as e:
+            print(f"Unable to login to {acc}: {e}")
+            print("Continuing to next account...")
+            continue
 
         if cfg.u:
             print(" Update main flag set. Updating main account subscriptions")
