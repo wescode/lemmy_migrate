@@ -135,8 +135,10 @@ class Lemmy:
         json: Optional[dict] = None,
     ) -> requests.Response:
         self._rate_limit()
+        token = self._auth_token
+        headers = {'Authorization': f'Bearer {token}'}
         try:
-            r = requests.request(method, url=endpoint, params=params, json=json)
+            r = requests.request(method, url=endpoint, params=params, json=json, headers=headers)
             r.raise_for_status()
             return r
         except requests.exceptions.HTTPError as e:
