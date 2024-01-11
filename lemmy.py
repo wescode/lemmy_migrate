@@ -1,7 +1,8 @@
-import requests
 from time import sleep
 from typing import Optional
 from urllib.parse import urlparse
+
+import requests
 
 
 class Lemmy:
@@ -136,9 +137,15 @@ class Lemmy:
     ) -> requests.Response:
         self._rate_limit()
         token = self._auth_token
-        headers = {'Authorization': f'Bearer {token}'}
+
+        headers = None
+        if token is not None:
+            headers = {"Authorization": f"Bearer {token}"}
+
         try:
-            r = requests.request(method, url=endpoint, params=params, json=json, headers=headers)
+            r = requests.request(
+                method, url=endpoint, params=params, json=json, headers=headers
+            )
             r.raise_for_status()
             return r
         except requests.exceptions.HTTPError as e:
