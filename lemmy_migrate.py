@@ -43,19 +43,21 @@ def get_args():
 
 
 def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy, from_backup):
-    print(
-        f"\n[ Subscribing {dest_acct.site_url} to new communities from "
-        f"{src_acct.site_url} ]"
-    )
-    print(" Getting list of subscribed communities from the two communities")
     if from_backup:
         src_comms = from_backup
+        print(f" {len(src_comms)} subscribed communities found from backup")
     else:
+        print(" Getting list of subscribed communities from the two communities")
+        print(
+            f"\n[ Subscribing {dest_acct.site_url} to new communities from "
+            f"{src_acct.site_url} ]"
+        )
+
         src_comms = src_acct.get_communities()
-    print(
-        f" {len(src_comms)} subscribed communities found in the source"
-        f" {src_acct.site_url}"
-    )
+        print(
+            f" {len(src_comms)} subscribed communities found in the source"
+            f" {src_acct.site_url}"
+        )
 
     dest_comms = dest_acct.get_communities()
     print(
@@ -113,8 +115,6 @@ def main():
     else:
         print(f"Logged into {accounts['Main Account']['site']}.")
 
-    accounts.pop("Main Account", None)
-
     # export subscriptions
     if cfg.e:
         write_backup(main_lemming, cfg.e)
@@ -122,8 +122,12 @@ def main():
 
     # import communites backed up if specified
     comms_backup = None
-    if cfg.i and not cfg.u:
+    if cfg.i:
         comms_backup = read_backup(cfg.i)
+        # import to main account
+        sync_subscriptions(None, main_lemming, comms_backup)
+
+    accounts.pop("Main Account", None)
 
     # sync main account communities to each account
     for acc in accounts:
