@@ -8,6 +8,7 @@ import requests
 class Lemmy:
     _api_version = "v3"
     _api_base_url = f"api/{_api_version}"
+    dry_run = False
 
     def __init__(self, url) -> None:
         parsed_url = urlparse(url)
@@ -73,19 +74,20 @@ class Lemmy:
                 if comm_id:
                     payload["community_id"] = comm_id
                     self._println(2, f"> Subscribing to {url} ({comm_id})")
-                    resp = self._request_it(
-                        f"{self.site_url}/"
-                        f"{self._api_base_url}/"
-                        f"community/follow",
-                        json=payload,
-                        method="POST",
-                    )
-
-                    if resp.status_code == 200:
-                        self._user_communities.add(comm_id)
-                        self._println(
-                            3, f"> Succesfully subscribed" f" to {url} ({comm_id})"
+                    if not Lemmy.dry_run:
+                        resp = self._request_it(
+                            f"{self.site_url}/"
+                            f"{self._api_base_url}/"
+                            f"community/follow",
+                            json=payload,
+                            method="POST",
                         )
+
+                        if resp.status_code == 200:
+                            self._user_communities.add(comm_id)
+                            self._println(
+                                3, f"> Succesfully subscribed" f" to {url} ({comm_id})"
+                            )
             except Exception as e:
                 print(f"   API error: {e}")
 

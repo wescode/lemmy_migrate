@@ -15,6 +15,7 @@ options:
   -u                use to update main account subscriptions
   -e <export file>  Export main account subscriptions to json
   -i <import file>  Import subscriptions from json file
+  -d                DryRun, make no changes
 
 ```
 
@@ -31,6 +32,7 @@ Password = apasswod
 Site = https://lemmy.ml
 User = cooluser
 Password = badpassword
+Exclude = news,politics
 ```
 [Main Account] is required for your primary account, and you can have as many secondary accounts as you wish. Label for
 secondary accounts can be anything.

@@ -2,12 +2,13 @@ import argparse
 import configparser
 import json
 import sys
+from urllib.parse import urlparse
 
 from lemmy import Lemmy
 
 
 def get_config(cfile):
-    config = configparser.ConfigParser(interpolation=None)
+    config = configparser.ConfigParser(defaults={"exclude": ""}, interpolation=None)
     read = config.read(cfile)
     if not read:
         print(f"Could not read config {cfile}!")
@@ -38,11 +39,14 @@ def get_args():
     parser.add_argument(
         "-i", help="Import subscriptions from json file", metavar="<import file>"
     )
+    parser.add_argument(
+        "-d", help="Dry run, make no modifications", action="store_true", default=False
+    )
     args = parser.parse_args()
     return args
 
 
-def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy, from_backup):
+def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy, from_backup, excld_comms):
     if from_backup:
         src_comms = from_backup
         print(f" {len(src_comms)} subscribed communities found from backup")
@@ -65,7 +69,22 @@ def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy, from_backup):
         f" {dest_acct.site_url}"
     )
 
-    new_communities = [c for c in src_comms if c not in dest_comms]
+    # remove excludes
+    exclds = None
+    if excld_comms:
+        exclds = excld_comms.split(",")
+
+    new_communities = []
+    for c in src_comms:
+        if c not in dest_comms:
+            # check exlucions
+            if exclds is not None:
+                if urlparse(c).path.split("/c/")[1] in exclds:
+                    print(f"  {c} is excluded")
+                else:
+                    new_communities.append(c)
+            else:
+                new_communities.append(c)
 
     if new_communities:
         print(f" Subscribing to {len(new_communities)} new communities")
@@ -99,6 +118,12 @@ def main():
     cfg = get_args()
     accounts = get_config(cfg.c)
 
+    # set dry run
+    Lemmy.dry_run = cfg.d
+
+    if Lemmy.dry_run:
+        print("\n*** DRY RUN enabled, no changes will be made ***")
+
     # source site
     print(f"\n[ Getting Main Account info -" f" {accounts['Main Account']['site']} ]")
     main_lemming = Lemmy(accounts["Main Account"]["site"])
@@ -113,7 +138,7 @@ def main():
         print(f"{e}")
         sys.exit(1)
     else:
-        print(f"Logged into {accounts['Main Account']['site']}.")
+        print(f" Logged into {accounts['Main Account']['site']}.")
 
     # export subscriptions
     if cfg.e:
@@ -148,7 +173,7 @@ def main():
             src = main_lemming
             dest = new_lemming
 
-        sync_subscriptions(src, dest, comms_backup)
+        sync_subscriptions(src, dest, comms_backup, accounts[acc]["exclude"])
 
 
 if __name__ == "__main__":
