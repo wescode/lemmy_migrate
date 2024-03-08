@@ -18,6 +18,13 @@ options:
   -d                DryRun, make no changes
 
 ```
+## Run
+```
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python lemmy_migrate.py
+```
 
 ## Configuration
 Operation is now controlled by a configuration file as such:
