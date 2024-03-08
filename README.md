@@ -47,4 +47,3 @@ secondary accounts can be anything.
 
 ## Requirements
 Python >= 3.10
-requests
