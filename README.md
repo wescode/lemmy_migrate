@@ -18,6 +18,13 @@ options:
   -d                DryRun, make no changes
 
 ```
+## Run
+```
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements
+python lemmy_migratey.py
+```
 
 ## Configuration
 Operation is now controlled by a configuration file as such:
@@ -40,3 +47,4 @@ secondary accounts can be anything.
 
 ## Requirements
 Python >= 3.10
+requests
