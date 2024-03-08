@@ -22,8 +22,8 @@ options:
 ```
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements
-python lemmy_migratey.py
+pip install -r requirements.txt
+python lemmy_migrate.py
 ```
 
 ## Configuration
