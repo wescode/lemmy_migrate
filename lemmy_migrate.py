@@ -74,21 +74,16 @@ def sync_subscriptions(src_acct: Lemmy, dest_acct: Lemmy, from_backup, excld_com
     if excld_comms:
         exclds = excld_comms.split(",")
 
-    new_communities = []
-    for c in src_comms:
-        if c not in dest_comms:
-            # check exlucions
-            if exclds is not None:
-                if urlparse(c).path.split("/c/")[1] in exclds:
-                    print(f"  {c} is excluded")
-                else:
-                    new_communities.append(c)
-            else:
-                new_communities.append(c)
+    new_comms = []
+    diff = src_comms - dest_comms
+    if exclds is not None:
+        new_comms = [c for c in diff if urlparse(c).path.split("/c/")[1] not in exclds]
+    else:
+        new_comms = diff
 
-    if new_communities:
-        print(f" Subscribing to {len(new_communities)} new communities")
-        dest_acct.subscribe(new_communities)
+    if new_comms:
+        print(f" Subscribing to {len(new_comms)} new communities")
+        dest_acct.subscribe(new_comms)
 
 
 def write_backup(account: Lemmy, output: str) -> None:

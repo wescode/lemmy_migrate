@@ -70,26 +70,25 @@ class Lemmy:
             try:
                 # resolve community first
                 comm_id = self.resolve_community(url)
+                payload["community_id"] = comm_id
+                self._println(2, f"> Subscribing to {url} ({comm_id})")
 
-                if comm_id:
-                    payload["community_id"] = comm_id
-                    self._println(2, f"> Subscribing to {url} ({comm_id})")
-                    if not Lemmy.dry_run:
-                        resp = self._request_it(
-                            f"{self.site_url}/"
-                            f"{self._api_base_url}/"
-                            f"community/follow",
-                            json=payload,
-                            method="POST",
+                if not Lemmy.dry_run:
+                    resp = self._request_it(
+                        f"{self.site_url}/"
+                        f"{self._api_base_url}/"
+                        f"community/follow",
+                        json=payload,
+                        method="POST",
+                    )
+
+                    if resp.status_code == 200:
+                        self._user_communities.add(comm_id)
+                        self._println(
+                            3, f"> Succesfully subscribed" f" to {url} ({comm_id})"
                         )
-
-                        if resp.status_code == 200:
-                            self._user_communities.add(comm_id)
-                            self._println(
-                                3, f"> Succesfully subscribed" f" to {url} ({comm_id})"
-                            )
             except Exception as e:
-                print(f"   API error: {e}")
+                self._println(3, e)
 
     def resolve_community(self, community: str) -> int | None:
         """resolve a community"""
@@ -104,7 +103,7 @@ class Lemmy:
             )
             community_id = resp.json()["community"]["community"]["id"]
         except Exception as e:
-            self._println(2, f"> Failed to resolve community {e}")
+            raise Exception(f"> Failed to resolve community {e}")
 
         return community_id
 
