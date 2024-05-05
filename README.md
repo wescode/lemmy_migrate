@@ -34,11 +34,13 @@ Operation is now controlled by a configuration file as such:
 Site = https://sh.itjust.works
 User = Imauser
 Password = apasswod
+2fa = False
 
 [Account 2]
 Site = https://lemmy.ml
 User = cooluser
 Password = badpassword
+2fa = True
 Exclude = news,politics
 ```
 [Main Account] is required for your primary account, and you can have as many secondary accounts as you wish. Label for

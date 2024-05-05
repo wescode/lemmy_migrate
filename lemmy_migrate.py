@@ -8,7 +8,9 @@ from lemmy import Lemmy
 
 
 def get_config(cfile):
-    config = configparser.ConfigParser(defaults={"exclude": ""}, interpolation=None)
+    config = configparser.ConfigParser(
+        defaults={"exclude": "", "2fa": False}, interpolation=None
+    )
     read = config.read(cfile)
     if not read:
         print(f"Could not read config {cfile}!")
@@ -124,7 +126,9 @@ def main():
     main_lemming = Lemmy(accounts["Main Account"]["site"])
     try:
         main_lemming.login(
-            accounts["Main Account"]["user"], accounts["Main Account"]["password"]
+            accounts["Main Account"]["user"],
+            accounts["Main Account"]["password"],
+            accounts["Main Account"]["2fa"],
         )
     except Exception as e:
         print(
@@ -154,7 +158,9 @@ def main():
         print(f"\n[ Getting {acc} - {accounts[acc]['site']} ]")
         new_lemming = Lemmy(accounts[acc]["site"])
         try:
-            new_lemming.login(accounts[acc]["user"], accounts[acc]["password"])
+            new_lemming.login(
+                accounts[acc]["user"], accounts[acc]["password"], accounts[acc]["2fa"]
+            )
         except Exception as e:
             print(f"Unable to login to {acc}: {e}")
             print("Continuing to next account...")

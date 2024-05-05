@@ -21,9 +21,17 @@ class Lemmy:
         self._auth_token = None
         self._user_communities = set()
 
-    def login(self, user: str, password: str) -> None:
+    def login(self, user: str, password: str, totp: str) -> None:
         """authenticate to instance"""
-        payload = {"username_or_email": user, "password": password}
+        totp_token = ""
+        if totp.lower() == "true":
+            totp_token = input("Enter TOTP 2FA token: ")
+
+        payload = {
+            "username_or_email": user,
+            "password": password,
+            "totp_2fa_token": totp_token,
+        }
 
         resp = self._request_it(
             f"{self.site_url}/" f"{self._api_base_url}/user/login",
@@ -137,11 +145,10 @@ class Lemmy:
         json: Optional[dict] = None,
     ) -> requests.Response:
         self._rate_limit()
-        token = self._auth_token
 
         headers = None
-        if token is not None:
-            headers = {"Authorization": f"Bearer {token}"}
+        if self._auth_token is not None:
+            headers = {"Authorization": f"Bearer {self._auth_token}"}
 
         try:
             r = requests.request(
